@@ -120,3 +120,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .product-page {
+    @apply p-4 w-full flex justify-around items-center flex-wrap gap-4;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

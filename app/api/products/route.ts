@@ -21,7 +21,17 @@ export async function POST(request: Request) {
   try {
     await connectDB();
     const body = await request.json();
+    body.price = +body.price;
     const newProduct = new Product(body);
+
+    // Check if name is exist
+    const checkName = await Product.findOne({ name: body.name });
+    if (checkName)
+      return NextResponse.json(
+        { error: "Name is already exist" },
+        { status: 400 }
+      );
+
     const savedProduct = await newProduct.save();
     return NextResponse.json(savedProduct, { status: 201 });
   } catch (error) {
