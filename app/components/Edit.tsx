@@ -10,7 +10,6 @@ import {
   Form,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
   FormField,
   FormItem,
@@ -20,39 +19,42 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { Product } from "../page.client";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(5, "Description must be at least 5 characters"),
-  price: z.string().min(1, "Price is required"),
-  imageUrl: z.string().url("Must be a valid URL"),
+  price: z.number().min(1, "Price is required"),
 });
 
-const Add = ({
-  setAddProduct,
+const Edit = ({
+  setEditProduct,
+  productId,
+  dataEdit,
 }: {
-  setAddProduct: (value: boolean) => void;
+  setEditProduct: (value: boolean) => void;
+  productId: string;
+  dataEdit: Product;
 }) => {
   const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      price: "",
-      imageUrl: "",
+      name: dataEdit.name,
+      description: dataEdit.description,
+      price: dataEdit.price,
     },
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    await fetch("/api/products", {
-      method: "POST",
+    await fetch(`http://localhost:3000/api/products/${productId}`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     router.push("/");
-    setAddProduct(false);
+    setEditProduct(false);
   };
 
   return (
@@ -60,7 +62,7 @@ const Add = ({
       <Card className="absolute min-w-[400px]">
         <CardHeader>
           <CardAction className="absolute top-4 right-4">
-            <Button variant="ghost" onClick={() => setAddProduct(false)}>
+            <Button variant="ghost" onClick={() => setEditProduct(false)}>
               <XIcon />
             </Button>
           </CardAction>
@@ -115,24 +117,7 @@ const Add = ({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Product image"
-                        type="file"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Add Product</Button>
+              <Button type="submit">Edit Product</Button>
             </form>
           </Form>
         </CardContent>
@@ -141,4 +126,4 @@ const Add = ({
   );
 };
 
-export default Add;
+export default Edit;
